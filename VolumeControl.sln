@@ -1,0 +1,60 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VolumeControl", "VolumeControl", "{A64BFF77-9AF7-43DB-B253-0E9753100379}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "VolumeControl.Shared", "VolumeControl\VolumeControl.Shared\VolumeControl.Shared.shproj", "{86B128D7-6275-437D-B8C3-D335787C1C31}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VolumeControl.Windows", "VolumeControl\VolumeControl.Windows\VolumeControl.Windows.csproj", "{CBACA273-EE01-42A1-AF7F-2563C34816E0}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		VolumeControl\VolumeControl.Shared\VolumeControl.Shared.projitems*{cbaca273-ee01-42a1-af7f-2563c34816e0}*SharedItemsImports = 4
+		VolumeControl\VolumeControl.Shared\VolumeControl.Shared.projitems*{86b128d7-6275-437d-b8c3-d335787c1c31}*SharedItemsImports = 13
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|ARM = Debug|ARM
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|ARM = Release|ARM
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CBACA273-EE01-42A1-AF7F-2563C34816E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBACA273-EE01-42A1-AF7F-2563C34816E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBACA273-EE01-42A1-AF7F-2563C34816E0}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{CBACA273-EE01-42A1-AF7F-2563C34816E0}.Debug|ARM.ActiveCfg = Debug|ARM
+		{CBACA273-EE01-42A1-AF7F-2563C34816E0}.Debug|ARM.Build.0 = Debug|ARM
+		{CBACA273-EE01-42A1-AF7F-2563C34816E0}.Debug|ARM.Deploy.0 = Debug|ARM
+		{CBACA273-EE01-42A1-AF7F-2563C34816E0}.Debug|x64.ActiveCfg = Debug|x64
+		{CBACA273-EE01-42A1-AF7F-2563C34816E0}.Debug|x64.Build.0 = Debug|x64
+		{CBACA273-EE01-42A1-AF7F-2563C34816E0}.Debug|x64.Deploy.0 = Debug|x64
+		{CBACA273-EE01-42A1-AF7F-2563C34816E0}.Debug|x86.ActiveCfg = Debug|x86
+		{CBACA273-EE01-42A1-AF7F-2563C34816E0}.Debug|x86.Build.0 = Debug|x86
+		{CBACA273-EE01-42A1-AF7F-2563C34816E0}.Debug|x86.Deploy.0 = Debug|x86
+		{CBACA273-EE01-42A1-AF7F-2563C34816E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBACA273-EE01-42A1-AF7F-2563C34816E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CBACA273-EE01-42A1-AF7F-2563C34816E0}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{CBACA273-EE01-42A1-AF7F-2563C34816E0}.Release|ARM.ActiveCfg = Release|ARM
+		{CBACA273-EE01-42A1-AF7F-2563C34816E0}.Release|ARM.Build.0 = Release|ARM
+		{CBACA273-EE01-42A1-AF7F-2563C34816E0}.Release|ARM.Deploy.0 = Release|ARM
+		{CBACA273-EE01-42A1-AF7F-2563C34816E0}.Release|x64.ActiveCfg = Release|x64
+		{CBACA273-EE01-42A1-AF7F-2563C34816E0}.Release|x64.Build.0 = Release|x64
+		{CBACA273-EE01-42A1-AF7F-2563C34816E0}.Release|x64.Deploy.0 = Release|x64
+		{CBACA273-EE01-42A1-AF7F-2563C34816E0}.Release|x86.ActiveCfg = Release|x86
+		{CBACA273-EE01-42A1-AF7F-2563C34816E0}.Release|x86.Build.0 = Release|x86
+		{CBACA273-EE01-42A1-AF7F-2563C34816E0}.Release|x86.Deploy.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{86B128D7-6275-437D-B8C3-D335787C1C31} = {A64BFF77-9AF7-43DB-B253-0E9753100379}
+		{CBACA273-EE01-42A1-AF7F-2563C34816E0} = {A64BFF77-9AF7-43DB-B253-0E9753100379}
+	EndGlobalSection
+EndGlobal
