@@ -5,18 +5,45 @@
     xmlns:local="using:VolumeControl"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    DataContext="{Binding RelativeSource={RelativeSource Self}}"
+    >
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
-          Tapped="Grid_Tapped">
-        <local:VolumeKnob x:Name="volume" Width="300" Height="340" Background="Black"
-                          BorderBrush="Coral"
-                          SliderBrush="Aqua"
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="450"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="60"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <local:VolumeKnob x:Name="VK" Grid.Row="0" Grid.Column="1" Background="DarkBlue"
+                           
+                          BorderBrush="Orange"
+                          BorderThickness="2"
+                          Margin="40,40,40,40"
+                          FontSize="50"
+                          Width="400"
+                          Height="400"
+                          SliderBrush="Red"
                           SliderBackgroundBrush ="Gray"
-                          SliderThickness="8"
-                          Tapped="VolumeKnob_Tapped" MinValue="0" MaxValue="100" Value="30" />
-        <!--
-        <Slider x:Name="slider"/>
-        -->
+                          SliderThickness="5"
+                          Minimum="0" Maximum="90" Value="85" 
+                           />
+        <StackPanel  Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Width="146">
+            <Button Content="Increase" FontSize="30" Tapped="VolumeIncrease"/>
+        </StackPanel>
+        <StackPanel  Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" Width="146">
+            <Button Content="Increase" FontSize="30" Tapped="VolumeDecrease"/>
+        </StackPanel>
+        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Knob.Value}" FontSize="30"
+                   HorizontalAlignment="Center"  VerticalAlignment="Center" Height="36" Margin="344,12,341,12" Width="0"/>
+        
+        <Slider  x:Name="slider" Grid.Row="2" Header="kkkk"/>
+        
     </Grid>
 </Page>

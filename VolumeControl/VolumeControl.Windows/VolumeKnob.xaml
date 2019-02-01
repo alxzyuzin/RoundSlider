@@ -9,34 +9,40 @@
     d:DesignHeight="200"
     d:DesignWidth="200"
     DataContext="{Binding RelativeSource={RelativeSource Self}}"
-    Loaded="Control_Loaded">
-
-<Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="20"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="20"/>
-        </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" Text="{Binding MousePosition}" FontSize="15"/>
-        <TextBlock Grid.Row="2" Text="{Binding Angle}" FontSize="15"/>
-
-        <Border Grid.Row="1" 
-                Background="{Binding Background}"
-                Width="{Binding Width}" Height="{Binding Height}"
+    
+    Loaded="Control_Loaded" Margin="{Binding Margin}"
+     HorizontalContentAlignment="Center"
+    VerticalContentAlignment="Center"
+    HorizontalAlignment="Center"
+    VerticalAlignment="Center"
+    
+    
+    >
+    <Grid Width="{Binding Width}" Height="{Binding Height}" Background="{Binding Background}"   >
+        
+        <Border  HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+              
+               
+                BorderBrush="{Binding BorderBrush}"
+                BorderThickness="{Binding BorderThickness}"
+            
+             
                 Tapped="Border_Tapped"
                 PointerMoved="Border_PointerMoved"
                 PointerWheelChanged="Border_PointerWheelChanged">
-            <Grid>
-                <Path x:Name="VolumePath" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
-                      Stroke="{Binding SliderBrush}"
+        <Grid  >
+            <Path x:Name="VolumePath" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                      Stroke="{Binding SliderBrush}"  
                       StrokeThickness="{Binding SliderThickness}"
-                      Data="{Binding VolumeGeometry}"
-                      />
-                <Path x:Name="VolumeBackGroundPath" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"   
+                      >
+
+            </Path>
+            <Path x:Name="VolumeBackGroundPath" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"   
                       Stroke="{Binding SliderBackgroundBrush}"  
                       StrokeThickness="{Binding SliderThickness}"
                       />
             </Grid>
     </Border>
-</Grid>
+        <TextBlock Text="{Binding Value}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+    </Grid>
 </UserControl>

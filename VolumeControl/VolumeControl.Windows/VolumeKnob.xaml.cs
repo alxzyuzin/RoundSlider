@@ -6,6 +6,7 @@ using Windows.UI;
 using Windows.UI.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 
@@ -13,28 +14,35 @@ using Windows.UI.Xaml.Media;
 
 namespace VolumeControl
 {
-    public sealed partial class VolumeKnob : UserControl, INotifyPropertyChanged
+    public sealed partial class VolumeKnob : UserControl //, INotifyPropertyChanged
     {
-        public double MinValue
-        {
-            get { return (double)GetValue(MinValueProperty); }
-            set { SetValue(MinValueProperty, (double)value); }
-        }
-        public static DependencyProperty MinValueProperty =
-                      DependencyProperty.Register("MinValue", typeof(double), typeof(VolumeKnob), null);
 
-        public double MaxValue
+        #region Properties
+        //        public event PropertyChangedEventHandler PropertyChanged;
+        public double Minimum
         {
-            get { return (double)GetValue(MaxValueProperty); }
-            set { SetValue(MaxValueProperty, (double)value); }
+            get { return (double)GetValue(MinimumProperty); }
+            set { SetValue(MinimumProperty, (double)value); }
         }
-        public static DependencyProperty MaxValueProperty =
-                      DependencyProperty.Register("MaxValue", typeof(double), typeof(VolumeKnob), null);
+        public static DependencyProperty MinimumProperty =
+                      DependencyProperty.Register("Minimum", typeof(double), typeof(VolumeKnob), null);
+
+        public double Maximum
+        {
+            get { return (double)GetValue(MaximumProperty); }
+            set { SetValue(MaximumProperty, (double)value); }
+        }
+        public static DependencyProperty MaximumProperty =
+                      DependencyProperty.Register("Maximum", typeof(double), typeof(VolumeKnob), null);
 
         public double Value
         {
             get { return (double)GetValue(ValueProperty); }
-            set { SetValue(ValueProperty, (double)value); }
+            set
+            {
+                SetValue(ValueProperty, (double)value);
+                UpdateSlider(ConvertValueToAngle(value));
+            }
         }
         public static DependencyProperty ValueProperty =
                       DependencyProperty.Register("Value", typeof(double), typeof(VolumeKnob), null);
@@ -63,6 +71,17 @@ namespace VolumeControl
         public static DependencyProperty SliderBackgroundBrushProperty =
                       DependencyProperty.Register(nameof(SliderBackgroundBrush), typeof(Brush), typeof(VolumeKnob), null);
 
+        public SliderSnapsTo SnapsTo
+        {
+            get; set;
+        }
+
+        public double StepFrequency { get; set; }
+
+        public double TickFrequency { get; set; }
+
+        public TickPlacement TickPlacement { get; set; }
+
 
         //public bool SliderThickness
         //{
@@ -73,85 +92,112 @@ namespace VolumeControl
         //public static DependencyProperty SliderThicknessProperty =
         //              DependencyProperty.Register("SliderThickness", typeof(bool), typeof(VolumeKnob), null);
 
-        private string _mousePosition;
-        public string MousePosition
-        {
-            get { return _mousePosition; }
-            set
-            {
-                if (_mousePosition!= value)
-                {
-                    _mousePosition = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MousePosition)));
-                }
-            }
+        //private string _mousePosition;
+        //public string MousePosition
+        //{
+        //    get { return _mousePosition; }
+        //    set
+        //    {
+        //        if (_mousePosition!= value)
+        //        {
+        //            _mousePosition = value;
+        //            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MousePosition)));
+        //        }
+        //    }
 
-        }
+        //}
 
-        private string _angle;
-        public string Angle
-        {
-            get { return _angle; }
-            set
-            {
-                if (_angle != value)
-                {
-                    _angle = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Angle)));
-                }
-            }
+        //private string _angle;
+        //public string Angle
+        //{
+        //    get { return _angle; }
+        //    set
+        //    {
+        //        if (_angle != value)
+        //        {
+        //            _angle = value;
+        //            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Angle)));
+        //        }
+        //    }
 
-        }
+        //}
 
+        #endregion
 
-        private double _startAngle = 5 * Math.PI / 8;
-        private double _endAngle = 3 * Math.PI / 8;
+        private const double _startAngle = 5 * Math.PI / 8;
+        private const double _endAngle = 3 * Math.PI / 8 +2 * Math.PI;
+        private const double _workingRangeAngle = 7 * Math.PI / 4;
 
-        private double _radius;
-        private Point  _center;
-        private Size   _size;
-        private double _valueAngle;
+        private double _radius = 150 - 4;
+        private Point  _center = new Point(150,150);
+        private Size   _size = new Size(150,150);
+
 
         public VolumeKnob()
         {
             this.InitializeComponent();
+            //_center.X = Width / 2; _center.Y = Height / 2;
 
-            var color = new Color();
-            color.R = 0xFF;
-            color.A = 0xFF;
-            var brash = new SolidColorBrush();
-            brash.Color = color;
+            //_center.X = Width / 2; _center.Y = Height / 2;
+            //_radius = (Math.Min(ActualWidth, ActualHeight) / 2) - SliderThickness - 2;
+            //_size.Width = _radius; _size.Height = _radius;
+            UpdateSlider(ConvertValueToAngle(Value));
 
-         }
+            //var color = new Color();
+            //color.R = 0xFF;
+            //color.A = 0xFF;
+            //var brash = new SolidColorBrush();
+            //brash.Color = color;
+
+        }
 
 
         private void Control_Loaded(object sender, RoutedEventArgs e)
         {
-            _center = new Point() { X = Width / 2, Y = Height / 2 - 4 };
-            _radius = (Math.Min(Width, Height) / 2) - SliderThickness - 2;
-            _size = new Size(_radius, _radius);
-            _valueAngle = 7 * Math.PI / 4 / (MaxValue - MinValue) * Value;
+            _center.X = (Width + Margin.Left - Margin.Right) / 2;
+            _center.Y = (Height + Margin.Top - Margin.Bottom) / 2;
 
-            VolumePath.Data = VolumeGeometry;
-            VolumeBackGroundPath.Data = VolumeBackgroundGeometry;
+             _radius = Math.Min(_center.X - (Margin.Left + Margin.Right) / 2,
+                               _center.Y - (Margin.Top + Margin.Bottom) / 2
+                              ) - SliderThickness - 2;
+             _size.Width = _size.Height = _radius;
+
+            double valueAngle = ConvertValueToAngle(Value);
+            UpdateSlider(valueAngle);
+
         }
 
         public void SetVolume()
         {
-            Value = Value < MinValue ? MinValue : Value;
-            Value = Value > MaxValue ? MaxValue : Value;
+            Value = Value < Minimum ? Minimum : Value;
+            Value = Value > Maximum ? Maximum : Value;
 
         }
 
-        public Geometry VolumeGeometry
+        private double ConvertValueToAngle(double value)
         {
-            get
-            {
-                double volumeAngle = _startAngle + _valueAngle;
-                bool largeAngle1 = _valueAngle > Math.PI ? true : false;
+            return _workingRangeAngle / (Maximum - Minimum) * value;
+        }
+        
+        private double ConvertAngleToValue(double angle)
+        {
+            return (Maximum - Minimum) / _workingRangeAngle * angle;
+        }
 
-                Point p0 = new Point(_center.X + _radius * Math.Cos(_startAngle), _center.Y + _radius * Math.Sin(_startAngle));
-                Point p1 = new Point(_center.X + _radius * Math.Cos(volumeAngle), _center.Y + _radius * Math.Sin(volumeAngle));
+
+        private void UpdateSlider(double valueAngle)
+        {
+            VolumePath.Data = GetSliderGeometry(_startAngle, _startAngle + valueAngle);
+            VolumeBackGroundPath.Data = GetSliderGeometry(_startAngle + valueAngle, _endAngle);
+        }
+
+        private Geometry GetSliderGeometry(double startAngle, double endAngle)
+        {
+                
+                bool largeAngle1 = (endAngle -  startAngle) > Math.PI ? true : false;
+
+                Point p0 = new Point(_center.X + _radius * Math.Cos(startAngle), _center.Y + _radius * Math.Sin(startAngle));
+                Point p1 = new Point(_center.X + _radius * Math.Cos(endAngle), _center.Y + _radius * Math.Sin(endAngle));
 
                 ArcSegment arcSegment = new ArcSegment()
                 {
@@ -174,119 +220,142 @@ namespace VolumeControl
                 pathGeometry.Figures.Add(pathFigure);
 
                 return pathGeometry;
-            }
+
         }
 
-        public Geometry VolumeBackgroundGeometry
+        public Geometry VolumeGeometry
         {
-            get
-            {
-                double volumeAngle = _startAngle + _valueAngle;
-                bool largeAngle = 7 * Math.PI / 4 - _valueAngle > Math.PI ? true : false;
-
-                double radius = (Math.Min(ActualWidth, ActualHeight) / 2) - SliderThickness - 2;
-                Size size = new Size(radius, radius);
-
-                Point p0 = new Point(_center.X + radius * Math.Cos(volumeAngle), _center.Y + radius * Math.Sin(volumeAngle));
-                Point p1 = new Point(_center.X + radius * Math.Cos(_endAngle), _center.Y + radius * Math.Sin(_endAngle));
-
-                ArcSegment arcSegment = new ArcSegment()
-                {
-                    IsLargeArc = largeAngle,
-                    Point = p1,
-                    Size = size,
-                    SweepDirection = SweepDirection.Clockwise,
-                    RotationAngle = 0.0
-                };
-
-                PathFigure pathFigure = new PathFigure()
-                {
-                    StartPoint = p0,
-                    IsClosed = false,
-                    IsFilled = false,
-                };
-                pathFigure.Segments.Add(arcSegment);
-
-                PathGeometry pathGeometry = new PathGeometry() { FillRule = FillRule.Nonzero };
-                pathGeometry.Figures.Add(pathFigure);
-
-                return pathGeometry;
-            }
+            get { return GetSliderGeometry(_startAngle, _startAngle + Math.PI/2); }
         }
+
+        //public Geometry VolumeGeometry
+        //{
+        //    get
+        //    {
+        //        double volumeAngle = _startAngle + _valueAngle;
+        //        bool largeAngle1 = _valueAngle > Math.PI ? true : false;
+
+        //        Point p0 = new Point(_center.X + _radius * Math.Cos(_startAngle), _center.Y + _radius * Math.Sin(_startAngle));
+        //        Point p1 = new Point(_center.X + _radius * Math.Cos(volumeAngle), _center.Y + _radius * Math.Sin(volumeAngle));
+
+        //        ArcSegment arcSegment = new ArcSegment()
+        //        {
+        //            IsLargeArc = largeAngle1,
+        //            Point = p1,
+        //            Size = _size,
+        //            SweepDirection = SweepDirection.Clockwise,
+        //            RotationAngle = 0.0
+        //        };
+
+        //        PathFigure pathFigure = new PathFigure()
+        //        {
+        //            StartPoint = p0,
+        //            IsClosed = false,
+        //            IsFilled = false,
+        //        };
+        //        pathFigure.Segments.Add(arcSegment);
+
+        //        PathGeometry pathGeometry = new PathGeometry() { FillRule = FillRule.Nonzero };
+        //        pathGeometry.Figures.Add(pathFigure);
+
+        //        return pathGeometry;
+        //    }
+        //}
+
+        //public Geometry VolumeBackgroundGeometry
+        //{
+        //    get
+        //    {
+        //        double volumeAngle = _startAngle + _valueAngle;
+        //        bool largeAngle = 7 * Math.PI / 4 - _valueAngle > Math.PI ? true : false;
+
+        //        double radius = (Math.Min(ActualWidth, ActualHeight) / 2) - SliderThickness - 2;
+        //        Size size = new Size(radius, radius);
+
+        //        Point p0 = new Point(_center.X + radius * Math.Cos(volumeAngle), _center.Y + radius * Math.Sin(volumeAngle));
+        //        Point p1 = new Point(_center.X + radius * Math.Cos(_endAngle), _center.Y + radius * Math.Sin(_endAngle));
+
+        //        ArcSegment arcSegment = new ArcSegment()
+        //        {
+        //            IsLargeArc = largeAngle,
+        //            Point = p1,
+        //            Size = size,
+        //            SweepDirection = SweepDirection.Clockwise,
+        //            RotationAngle = 0.0
+        //        };
+
+        //        PathFigure pathFigure = new PathFigure()
+        //        {
+        //            StartPoint = p0,
+        //            IsClosed = false,
+        //            IsFilled = false,
+        //        };
+        //        pathFigure.Segments.Add(arcSegment);
+
+        //        PathGeometry pathGeometry = new PathGeometry() { FillRule = FillRule.Nonzero };
+        //        pathGeometry.Figures.Add(pathFigure);
+
+        //        return pathGeometry;
+        //    }
+        //}
 
         private Point _lastPointerPosition = new Point(-1, -1);
 
+        private double PointerDeviation(Point pointerPosition)
+        {
+            return Math.Abs(
+                            Math.Sqrt(
+                                        Math.Pow(pointerPosition.X - _center.X, 2) +
+                                        Math.Pow(pointerPosition.Y - _center.Y, 2)
+                                      ) - _radius
+                           );
+        }
+
         private void Border_Tapped(object sender, TappedRoutedEventArgs e)
         {
-
-            double aaa = Math.Atan(0.125);
-            double bbb = Math.Atan(0.25);
-            double ccc = Math.Atan(0.5);
-            double ddd = Math.Atan(1);
             Point PointerPosition = e.GetPosition(this);
 
-            _valueAngle =  PointToAngle(PointerPosition);
-           // _valueAngle = Math.Atan(_center.Y - PointerPosition.Y  / _center.X - PointerPosition.X );
+            if (PointerDeviation(PointerPosition) < 40)
+            {
+                 double valueAngle = PointToAngle(PointerPosition);
 
-            VolumePath.Data = VolumeGeometry;
-            VolumeBackGroundPath.Data = VolumeBackgroundGeometry;
-            // PointerPoint PointerPoint = e.GetCurrentPoint(this);
-            // if (Math.Abs(_lastPointerPosition.X - PointerPoint.Position.X) > 10 ||
+                UpdateSlider(valueAngle);
+                Value = ConvertAngleToValue(valueAngle);
+            }
         }
+
 
         private void Border_PointerMoved(object sender, PointerRoutedEventArgs e)
         {
-//            PointerPoint PointerPoint = e.GetCurrentPoint(this);
-//            if (Math.Abs(_lastPointerPosition.X - PointerPoint.Position.X) > 10 ||
-//                (_lastPointerPosition.Y - PointerPoint.Position.Y) > 10)
-//            {
-//                _lastPointerPosition = PointerPoint.Position;
+            PointerPoint pointerPoint = e.GetCurrentPoint(this);
 
-//                double x = PointerPoint.Position.X - _center.X;
-//                double y = _center.Y - PointerPoint.Position.Y;
-////                MousePosition = $"X:{x.ToString()} Y:{y.ToString()}";
-//            }
+            if (pointerPoint.IsInContact)
+            {
+                if (PointerDeviation(pointerPoint.Position) < 40)
+                {
+                    double valueAngle = PointToAngle(pointerPoint.Position);
+
+                    UpdateSlider(valueAngle);
+                    Value = ConvertAngleToValue(valueAngle);
+                }
+            }
         }
 
         private double PointToAngle(Point p)
         {
-            double angle =0;
-            // Точка лежит в нижнем левом квадранте
-            if (p.X < _center.X && p.Y > _center.Y)
-            {
-                double x = _center.X - p.X;
-                double y = p.Y -_center.Y ;
-                MousePosition = $"X:{x.ToString()} Y:{y.ToString()}";
-                angle = Math.Max(Math.Atan(x / y) - Math.PI/8, Math.PI/8);
-                Angle = $"Angle: {angle.ToString()}";
-            }
+            double angle = Math.Atan((p.Y - _center.Y) / (p.X - _center.X));
+            if (p.X < _center.X)
+                angle += Math.PI;
+            if (p.X > _center.X)
+                angle += 2 * Math.PI;
 
-
-            if (p.X < _center.X && p.Y < _center.Y)
-            {
-                double x = _center.X - p.X;
-                double y = _center.Y - p.Y;
-                MousePosition = $"X:{x.ToString()} Y:{y.ToString()}";
-                angle = Math.Atan(y / x) + Math.PI - _startAngle;
-                Angle = $"Angle: {angle.ToString()}";
-            }
-
-            // Точка лежит в верхнем левом квадранте
-            //if (n.X < 0 && n.Y >= 0)
-            //{
-            //    double aaaaa = Math.Atan(Math.Abs(n.Y / n.X));
-
-            //    angle = Math.PI / 4 + Math.Atan(n.Y / n.X);
-            //}
-
-
-
-
+            angle -= _startAngle;
+            angle = Math.Max(angle,0);
+            angle = Math.Min(angle, 7 * Math.PI / 4);
             return angle;
-
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+
 
         private void Border_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
         {
