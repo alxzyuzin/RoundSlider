@@ -71,6 +71,8 @@ namespace VolumeControl
         public static DependencyProperty SliderBackgroundBrushProperty =
                       DependencyProperty.Register(nameof(SliderBackgroundBrush), typeof(Brush), typeof(VolumeKnob), null);
 
+        public double MouseTiltValue { get; set; } = 1;
+
         public SliderSnapsTo SnapsTo
         {
             get; set;
@@ -187,56 +189,60 @@ namespace VolumeControl
 
         private void UpdateSlider(double valueAngle)
         {
-            VolumePath.Data = GetSliderGeometry(_startAngle, _startAngle + valueAngle);
-            VolumeBackGroundPath.Data = GetSliderGeometry(_startAngle + valueAngle, _endAngle);
+            double pointerAngle = 2 * SliderThickness / (Math.PI * _radius);
+
+            valueAngle -= pointerAngle;
+
+            bool largeAngle1 = valueAngle > Math.PI ? true : false;
+
+            valueAngle += _startAngle;
+            bool largeAngle3 = _endAngle - valueAngle > Math.PI ? true : false;
+
+            Point p0 = new Point(_center.X + _radius * Math.Cos(_startAngle), _center.Y + _radius * Math.Sin(_startAngle));
+            Point p1 = new Point(_center.X + _radius * Math.Cos(valueAngle), _center.Y + _radius * Math.Sin(valueAngle));
+            Point p2 = new Point(_center.X + _radius * Math.Cos(valueAngle + 2* pointerAngle), _center.Y + _radius * Math.Sin(valueAngle + 2 * pointerAngle));
+            Point p3 = new Point(_center.X + _radius * Math.Cos(_endAngle), _center.Y + _radius * Math.Sin(_endAngle));
+            figure1.StartPoint = p0;
+            figure2.StartPoint = p1;
+            figure3.StartPoint = p2;
+
+            arc1.IsLargeArc = largeAngle1;
+            arc1.Point = p1;
+            arc1.Size = _size;
+
+            arc2.IsLargeArc = false;
+            arc2.Point = p2;
+            arc2.Size = _size;
+
+            arc3.IsLargeArc = largeAngle3;
+            arc3.Point = p3;
+            arc3.Size = _size;
+
+            //    VolumePath.Data = GetSliderGeometry(_startAngle, _startAngle + valueAngle);
+            //    VolumeBackGroundPath.Data = GetSliderGeometry(_startAngle + valueAngle, _endAngle);
         }
 
-        private Geometry GetSliderGeometry(double startAngle, double endAngle)
+
+        private void SetArc(ArcSegment arc, double startAngle, double endAngle)
         {
-                
-                bool largeAngle1 = (endAngle -  startAngle) > Math.PI ? true : false;
+            bool largeAngle1 = (endAngle - startAngle) > Math.PI ? true : false;
+            Point p0 = new Point(_center.X + _radius * Math.Cos(startAngle), _center.Y + _radius * Math.Sin(startAngle));
+            Point p1 = new Point(_center.X + _radius * Math.Cos(endAngle), _center.Y + _radius * Math.Sin(endAngle));
 
-                Point p0 = new Point(_center.X + _radius * Math.Cos(startAngle), _center.Y + _radius * Math.Sin(startAngle));
-                Point p1 = new Point(_center.X + _radius * Math.Cos(endAngle), _center.Y + _radius * Math.Sin(endAngle));
-
-                ArcSegment arcSegment = new ArcSegment()
-                {
-                    IsLargeArc = largeAngle1,
-                    Point = p1,
-                    Size = _size,
-                    SweepDirection = SweepDirection.Clockwise,
-                    RotationAngle = 0.0
-                };
-
-                PathFigure pathFigure = new PathFigure()
-                {
-                    StartPoint = p0,
-                    IsClosed = false,
-                    IsFilled = false,
-                };
-                pathFigure.Segments.Add(arcSegment);
-
-                PathGeometry pathGeometry = new PathGeometry() { FillRule = FillRule.Nonzero };
-                pathGeometry.Figures.Add(pathFigure);
-
-                return pathGeometry;
+            arc.IsLargeArc = largeAngle1;
+            arc.Point = p1;
+            arc.Size = _size;
+            
 
         }
 
-        public Geometry VolumeGeometry
-        {
-            get { return GetSliderGeometry(_startAngle, _startAngle + Math.PI/2); }
-        }
-
-        //public Geometry VolumeGeometry
+        //private Geometry GetSliderGeometry(double startAngle, double endAngle)
         //{
-        //    get
-        //    {
-        //        double volumeAngle = _startAngle + _valueAngle;
-        //        bool largeAngle1 = _valueAngle > Math.PI ? true : false;
+                
+        //        bool largeAngle1 = (endAngle -  startAngle) > Math.PI ? true : false;
 
-        //        Point p0 = new Point(_center.X + _radius * Math.Cos(_startAngle), _center.Y + _radius * Math.Sin(_startAngle));
-        //        Point p1 = new Point(_center.X + _radius * Math.Cos(volumeAngle), _center.Y + _radius * Math.Sin(volumeAngle));
+        //        Point p0 = new Point(_center.X + _radius * Math.Cos(startAngle), _center.Y + _radius * Math.Sin(startAngle));
+        //        Point p1 = new Point(_center.X + _radius * Math.Cos(endAngle), _center.Y + _radius * Math.Sin(endAngle));
 
         //        ArcSegment arcSegment = new ArcSegment()
         //        {
@@ -259,45 +265,14 @@ namespace VolumeControl
         //        pathGeometry.Figures.Add(pathFigure);
 
         //        return pathGeometry;
-        //    }
+
         //}
 
-        //public Geometry VolumeBackgroundGeometry
+        //public Geometry VolumeGeometry
         //{
-        //    get
-        //    {
-        //        double volumeAngle = _startAngle + _valueAngle;
-        //        bool largeAngle = 7 * Math.PI / 4 - _valueAngle > Math.PI ? true : false;
-
-        //        double radius = (Math.Min(ActualWidth, ActualHeight) / 2) - SliderThickness - 2;
-        //        Size size = new Size(radius, radius);
-
-        //        Point p0 = new Point(_center.X + radius * Math.Cos(volumeAngle), _center.Y + radius * Math.Sin(volumeAngle));
-        //        Point p1 = new Point(_center.X + radius * Math.Cos(_endAngle), _center.Y + radius * Math.Sin(_endAngle));
-
-        //        ArcSegment arcSegment = new ArcSegment()
-        //        {
-        //            IsLargeArc = largeAngle,
-        //            Point = p1,
-        //            Size = size,
-        //            SweepDirection = SweepDirection.Clockwise,
-        //            RotationAngle = 0.0
-        //        };
-
-        //        PathFigure pathFigure = new PathFigure()
-        //        {
-        //            StartPoint = p0,
-        //            IsClosed = false,
-        //            IsFilled = false,
-        //        };
-        //        pathFigure.Segments.Add(arcSegment);
-
-        //        PathGeometry pathGeometry = new PathGeometry() { FillRule = FillRule.Nonzero };
-        //        pathGeometry.Figures.Add(pathFigure);
-
-        //        return pathGeometry;
-        //    }
+        //    get { return GetSliderGeometry(_startAngle, _startAngle + Math.PI/2); }
         //}
+
 
         private Point _lastPointerPosition = new Point(-1, -1);
 
@@ -359,16 +334,19 @@ namespace VolumeControl
 
         private void Border_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
         {
-            //PointerPoint PointerPoint = e.GetCurrentPoint(this);
-            //if (Math.Abs(_lastPointerPosition.X - PointerPoint.Position.X)>10 ||
-            //    (_lastPointerPosition.Y - PointerPoint.Position.Y)> 10)
-            //{
-            //    _lastPointerPosition = PointerPoint.Position;
-            //    MousePosition = $"X:{PointerPoint.Position.X.ToString()} Y:{PointerPoint.Position.Y.ToString()}";
-            //}
-            
+            var newValue = Value + e.GetCurrentPoint((UIElement)sender).Properties.MouseWheelDelta / 120 * MouseTiltValue;
+            if (newValue > Maximum)
+            {
+                Value = Maximum;
+                return;
+            }
+            if (newValue < Minimum)
+            {
+                Value = Minimum;
+                return;
+            }
 
-           
+            Value = newValue;
         }
 
     

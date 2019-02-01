@@ -33,6 +33,7 @@
                           SliderBackgroundBrush ="Gray"
                           SliderThickness="5"
                           Minimum="0" Maximum="90" Value="85" 
+                          MouseTiltValue="10"
                            />
         <StackPanel  Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Width="146">
             <Button Content="Increase" FontSize="30" Tapped="VolumeIncrease"/>

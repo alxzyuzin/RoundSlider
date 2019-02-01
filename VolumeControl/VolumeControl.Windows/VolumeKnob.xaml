@@ -11,38 +11,70 @@
     DataContext="{Binding RelativeSource={RelativeSource Self}}"
     
     Loaded="Control_Loaded" Margin="{Binding Margin}"
-     HorizontalContentAlignment="Center"
+    HorizontalContentAlignment="Center"
     VerticalContentAlignment="Center"
     HorizontalAlignment="Center"
     VerticalAlignment="Center"
     
     
     >
-    <Grid Width="{Binding Width}" Height="{Binding Height}" Background="{Binding Background}"   >
-        
+    <Grid Width="{Binding Width}" Height="{Binding Height}" Background="{Binding Background}"
+          
+           Tapped="Border_Tapped"
+           PointerMoved="Border_PointerMoved"
+           PointerWheelChanged="Border_PointerWheelChanged">
+
         <Border  HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-              
-               
                 BorderBrush="{Binding BorderBrush}"
-                BorderThickness="{Binding BorderThickness}"
-            
-             
+                BorderThickness="{Binding BorderThickness}">
+
+
+            <Grid 
                 Tapped="Border_Tapped"
                 PointerMoved="Border_PointerMoved"
-                PointerWheelChanged="Border_PointerWheelChanged">
-        <Grid  >
-            <Path x:Name="VolumePath" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                >
+                <Path x:Name="VolumePath" 
                       Stroke="{Binding SliderBrush}"  
-                      StrokeThickness="{Binding SliderThickness}"
-                      >
-
-            </Path>
-            <Path x:Name="VolumeBackGroundPath" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"   
+                      StrokeThickness="{Binding SliderThickness}">
+                    <Path.Data>
+                        <PathGeometry>
+                            <PathFigure x:Name="figure1" IsClosed="False" IsFilled="False" >
+                                <PathFigure.Segments>
+                                    <ArcSegment x:Name="arc1" SweepDirection="Clockwise" RotationAngle="0.0" />
+                                </PathFigure.Segments>
+                            </PathFigure> 
+                        </PathGeometry>
+                    </Path.Data>
+                </Path>
+                <Path x:Name="VolumePointerPath"   
+                      Stroke="White"  
+                      StrokeThickness="{Binding SliderThickness}">
+                    <Path.Data>
+                        <PathGeometry>
+                            <PathFigure x:Name="figure2" IsClosed="False" IsFilled="False">
+                                <PathFigure.Segments>
+                                    <ArcSegment x:Name="arc2" SweepDirection="Clockwise" RotationAngle="0.0"  />
+                                </PathFigure.Segments>
+                            </PathFigure>
+                        </PathGeometry>
+                    </Path.Data>
+                </Path>
+                <Path x:Name="VolumeBackGroundPath"
                       Stroke="{Binding SliderBackgroundBrush}"  
-                      StrokeThickness="{Binding SliderThickness}"
-                      />
-            </Grid>
+                      StrokeThickness="{Binding SliderThickness}">
+                <Path.Data>
+                    <PathGeometry>
+                        <PathFigure x:Name="figure3" IsClosed="False" IsFilled="False">
+                            <PathFigure.Segments>
+                                <ArcSegment x:Name="arc3" SweepDirection="Clockwise" RotationAngle="0.0"  />
+                            </PathFigure.Segments>
+                        </PathFigure>
+                     </PathGeometry>
+                </Path.Data>
+            </Path>
+        </Grid>
+
     </Border>
-        <TextBlock Text="{Binding Value}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <!--TextBlock Text="{Binding Value}" VerticalAlignment="Center" HorizontalAlignment="Center"/-->
     </Grid>
 </UserControl>
